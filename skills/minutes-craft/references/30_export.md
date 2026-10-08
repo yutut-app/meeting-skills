@@ -23,16 +23,22 @@
 
 ### 使い方
 
+**`SKILL.md` を読んだディレクトリの絶対パスを `SKILL_DIR` に置いてから呼ぶ。**
+相対パスで呼ばない。**作業ディレクトリは呼び出しごとに戻るため、相対パスは外れる。**
+
 ```bash
+SKILL_DIR=<SKILL.md を読んだディレクトリの絶対パス>
+
 # 案件ディレクトリ（その案件だけのもの）
-WS=$(scripts/ws-path.sh "261008_○○株式会社-上期打合せ") || exit 1
+WS=$("$SKILL_DIR/scripts/ws-path.sh" "261008_○○株式会社-上期打合せ") || exit 1
 
 # 領域直下（PJ を越えて効くもの。formats/ と glossary.md がここ）
-DOMAIN=$(scripts/ws-path.sh --domain-root) || exit 1
+DOMAIN=$("$SKILL_DIR/scripts/ws-path.sh" --domain-root) || exit 1
 ```
 
-**この2つがパスの出所。** 本文と参照ファイルに絶対パスを直接書かない。
+**この2つがパスの出所。** 本文と参照ファイルに**作業スペースの**絶対パスを書かない。
 書くと、置き場所を変えたときに書き換えが漏れる。
+`SKILL_DIR` はスキル自身の位置で、作業スペースの置き場所とは別のもの。
 
 ### formats/ と glossary.md の使い分け
 
