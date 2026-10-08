@@ -1,5 +1,3 @@
-# 議事録の実物は作業スペースに置く。万一ここに置かれても push しない。
-*/minutes*.md
-*/source/
-work/
+# local/ は手元だけで版管理する。独立した git リポジトリで、remote を持たない。
+/local/
 .DS_Store
