@@ -13,7 +13,7 @@ DOMAIN="${2:-work}"
 
 usage() {
   echo "usage: $(basename "$0") <YYMMDD_PJ名> [領域]" >&2
-  echo "  例: $(basename "$0") 261008_アルファ精機-上期打合せ" >&2
+  echo "  例: $(basename "$0") 261008_○○株式会社-上期打合せ" >&2
 }
 
 PJ="${1:-}"
