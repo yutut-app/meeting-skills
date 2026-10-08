@@ -4,7 +4,12 @@
 # 一度 push すると履歴から取り除けない。
 #
 # 使い方: ws-path.sh <YYMMDD_PJ名> [領域]
-# 出力:   案件ディレクトリの絶対パス（作成済み）
+#         ws-path.sh --domain-root [領域]   領域直下（PJ を越えて効くもの）
+# 出力:   ディレクトリの絶対パス（作成済み）
+#
+# 領域直下には、PJ を越えて効くが公開できないものを置く。
+#   formats/   取引先ごとの議事録フォーマット
+#   glossary.md  分野・取引先ごとの用語集（崩れた語の確定履歴）
 # 失敗時: 標準エラーに理由を出して非ゼロで終了する。既定の場所へ落とさない。
 set -euo pipefail
 
@@ -13,8 +18,26 @@ DOMAIN="${2:-work}"
 
 usage() {
   echo "usage: $(basename "$0") <YYMMDD_PJ名> [領域]" >&2
+  echo "       $(basename "$0") --domain-root [領域]" >&2
   echo "  例: $(basename "$0") 261008_○○株式会社-上期打合せ" >&2
 }
+
+# 領域直下を返す。formats/ と glossary.md の置き場所もここだけが知っている。
+if [ "${1:-}" = "--domain-root" ]; then
+  DOMAIN="${2:-work}"
+  if [ ! -d "$WS_ROOT" ]; then
+    echo "error: 作業スペースの根が無い: $WS_ROOT" >&2
+    echo "  MINUTES_WS_ROOT で場所を指定できる。推測で別の場所に書かない。" >&2
+    exit 1
+  fi
+  ROOT="$WS_ROOT/$DOMAIN"
+  mkdir -p "$ROOT/formats" || {
+    echo "error: 領域ディレクトリを作れない: $ROOT" >&2
+    exit 1
+  }
+  printf '%s\n' "$ROOT"
+  exit 0
+fi
 
 PJ="${1:-}"
 if [ -z "$PJ" ]; then
