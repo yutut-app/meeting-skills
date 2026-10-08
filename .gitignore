@@ -1,0 +1,5 @@
+# 議事録の実物は作業スペースに置く。万一ここに置かれても push しない。
+*/minutes*.md
+*/source/
+work/
+.DS_Store
