@@ -6,24 +6,38 @@
 # 出力:   ディレクトリの絶対パス（作成済み）
 # 失敗時: 標準エラーに理由を出して非ゼロで終了する。既定の場所へ落とさない。
 #
-# 作業スペースの根は環境変数 MINUTES_WS_ROOT で指定する。未設定なら止める。
-# 推測で書くと、どこに書いたか分からないまま進むため。
+# 作業スペースの根は次の順で決める。どちらも無ければ止める。
+#   1. 環境変数 MINUTES_WS_ROOT
+#   2. 設定ファイル ~/.config/minutes-craft/ws-root の1行目
+# 推測で書くと、どこに書いたか分からないまま進むため、既定の場所へは落とさない。
+#
+# 環境変数は、対話していないシェルでは読まれないことがある。
+# そのときのために設定ファイルを見る。
 #
 # 領域直下に置くもの:
 #   formats/     相手先ごとの議事録フォーマット
 #   glossary.md  分野ごとの用語集（崩れた語の確定結果）
 set -euo pipefail
 
+CONF="${XDG_CONFIG_HOME:-$HOME/.config}/minutes-craft/ws-root"
+
 usage() {
   echo "usage: $(basename "$0") <YYMMDD_PJ名> [領域]" >&2
   echo "       $(basename "$0") --domain-root [領域]" >&2
-  echo "  環境変数 MINUTES_WS_ROOT に作業スペースの根を設定しておく" >&2
+  echo "  作業スペースの根を、環境変数 MINUTES_WS_ROOT か" >&2
+  echo "  設定ファイル $CONF の1行目に書いておく" >&2
 }
 
 WS_ROOT="${MINUTES_WS_ROOT:-}"
+if [ -z "$WS_ROOT" ] && [ -r "$CONF" ]; then
+  WS_ROOT=$(head -n 1 "$CONF")
+  # 先頭の ~ を展開する。設定ファイルに書くときに使われやすいため。
+  case "$WS_ROOT" in "~/"*) WS_ROOT="$HOME/${WS_ROOT#\~/}" ;; esac
+fi
 if [ -z "$WS_ROOT" ]; then
-  echo "error: MINUTES_WS_ROOT が設定されていない" >&2
-  echo "  作業スペースの根を指定する。既定の場所へは落とさない。" >&2
+  echo "error: 作業スペースの根が決まらない" >&2
+  echo "  環境変数 MINUTES_WS_ROOT も、設定ファイル $CONF も無い。" >&2
+  echo "  既定の場所へは落とさない。" >&2
   usage
   exit 1
 fi
